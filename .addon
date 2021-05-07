@@ -1,0 +1,19 @@
+{
+		"name": "balls_wars",
+		"sharedassets": "*.*",
+		
+		"depends": 
+		[
+			"base",
+			"citizen",
+			"rust"
+		],
+
+		"gamemodes":
+		[
+			{
+				"name": "balls_wars",
+				"title": "Ball Wars"
+			}
+		]
+}
