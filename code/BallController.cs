@@ -129,7 +129,7 @@ namespace Sandbox
 			}
 
 			SaveGroundPos();
-			Debug = true;
+
 			if ( Debug )
 			{
 				DebugOverlay.Box( Pos + TraceOffset, mins, maxs, Color.Red );
