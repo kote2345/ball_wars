@@ -16,16 +16,11 @@ namespace Sandbox
 		public float SprintSpeed { get; set; } = 100.0f;
 		public float WalkSpeed { get; set; } = 100.0f;
 		public float DefaultSpeed { get; set; } = 100.0f;
-		public float Acceleration { get; set; } = 1;
-		public float AirAcceleration { get; set; } = 1;
-		public float FallSoundZ { get; set; } = -30.0f;
-		public float GroundFriction { get; set; } = 4.0f;
+		public float AirAcceleration { get; set; } = 10;
 		public float StopSpeed { get; set; } = 100.0f;
-		public float Size { get; set; } = 20.0f;
 		public float DistEpsilon { get; set; } = 0.03125f;
 		public float GroundNormalZ { get; set; } = 0.707f;
 		public float Bounce { get; set; } = 0.0f;
-		public float MoveFriction { get; set; } = 1.0f;
 		public float StepSize { get; set; } = 18.0f;
 		public float MaxNonJumpVelocity { get; set; } = 140.0f;
 		public float BodyGirth { get; set; } = 32.0f;
@@ -56,7 +51,6 @@ namespace Sandbox
 
 			return new BBox( mins, maxs );
 		}
-
 
 		// Duck body height 32
 		// Eye Height 64
@@ -99,71 +93,13 @@ namespace Sandbox
 
 			RestoreGroundPos();
 
-			//Velocity += BaseVelocity * ( 1 + Time.Delta * 0.5f );
-			//BaseVelocity = Vector3.Zero;
-
-			//  Rot = Rotation.LookAt( Input.Rot.Forward.WithZ( 0 ), Vector3.Up );
-
 			if ( Unstuck.TestAndFix() )
 				return;
 
-			// Check Stuck
-			// Unstuck - or return if stuck
-
-			// Set Ground Entity to null if  falling faster then 250
-
-			// store water level to compare later
-
-			// if not on ground, store fall velocity
-
-			// player->UpdateStepSound( player->m_pSurfaceData, mv->GetAbsOrigin(), mv->m_vecVelocity )
-
-
-			// RunLadderMode
-
-
-			//
-			// Start Gravity
-			//
-			Velocity -= new Vector3( 0, 0, Gravity * 0.5f ) * Time.Delta;
-			Velocity += new Vector3( 0, 0, BaseVelocity.z ) * Time.Delta;
-
-			BaseVelocity = BaseVelocity.WithZ( 0 );
-
-
-			/*
-             if (player->m_flWaterJumpTime)
-	            {
-		            WaterJump();
-		            TryPlayerMove();
-		            // See if we are still in water?
-		            CheckWater();
-		            return;
-	            }
-            */
-
-			// if ( underwater ) do underwater movement
 
 			if ( AutoJump ? Input.Down( InputButton.Jump ) : Input.Pressed( InputButton.Jump ) )
 			{
 				CheckJumpButton();
-			}
-
-			// Fricion is handled before we add in any base velocity. That way, if we are on a conveyor, 
-			//  we don't slow when standing still, relative to the conveyor.
-			bool bStartOnGround = GroundEntity != null;
-			//bool bDropSound = false;
-			if ( bStartOnGround )
-			{
-				//if ( Velocity.z < FallSoundZ ) bDropSound = true;
-
-				Velocity = Velocity.WithZ( 0 );
-				//player->m_Local.m_flFallVelocity = 0.0f;
-
-				if ( GroundEntity != null )
-				{
-					ApplyFriction( GroundFriction * SurfaceFriction );
-				}
 			}
 
 			//
@@ -173,42 +109,27 @@ namespace Sandbox
 			var inSpeed = WishVelocity.Length.Clamp( 0, 1 );
 			WishVelocity *= Input.Rot;
 
-			WishVelocity = WishVelocity.WithZ( 0 );
-
 			WishVelocity = WishVelocity.Normal * inSpeed;
 			WishVelocity *= GetWishSpeed();
 
 			Duck.PreTick();
 
 			bool bStayOnGround = false;
-			if ( GroundEntity != null )
-			{
-				bStayOnGround = true;
-				AirMove();
-			}
-			else
-			{
-				AirMove();
-			}
 
+			ApplyFriction( 0.5f );
+			AirMove();
+			
 			CategorizePosition( bStayOnGround );
 
-			// FinishGravity
-			Velocity -= new Vector3( 0, 0, Gravity * 0.5f ) * Time.Delta;
-
 
 			if ( GroundEntity != null )
 			{
-				Velocity = Velocity.WithZ( 0 );
+				Log.Info( "1" );
+				Velocity = Velocity.WithZ( 0);
 			}
 
-			// CheckFalling(); // fall damage etc
-
-			// Land Sound
-			// Swim Sounds
-
 			SaveGroundPos();
-
+			Debug = true;
 			if ( Debug )
 			{
 				DebugOverlay.Box( Pos + TraceOffset, mins, maxs, Color.Red );
@@ -238,142 +159,11 @@ namespace Sandbox
 			return DefaultSpeed;
 		}
 
-		void WalkMove()
-		{
-			var wishdir = WishVelocity.Normal;
-			var wishspeed = WishVelocity.Length;
-
-			WishVelocity = WishVelocity.WithZ( 0 );
-			WishVelocity = WishVelocity.Normal * wishspeed;
-
-			Velocity = Velocity.WithZ( 0 );
-			Accelerate( wishdir, wishspeed, 0, Acceleration );
-			Velocity = Velocity.WithZ( 0 );
-
-			//   Player.SetAnimParam( "forward", Input.Forward );
-			//   Player.SetAnimParam( "sideward", Input.Right );
-			//   Player.SetAnimParam( "wishspeed", wishspeed );
-			//    Player.SetAnimParam( "walkspeed_scale", 2.0f / 190.0f );
-			//   Player.SetAnimParam( "runspeed_scale", 2.0f / 320.0f );
-
-			//  DebugOverlay.Text( 0, Pos + Vector3.Up * 100, $"forward: {Input.Forward}\nsideward: {Input.Right}" );
-
-			// Add in any base velocity to the current velocity.
-			Velocity += BaseVelocity;
-
-			try
-			{
-				if ( Velocity.Length < 1.0f )
-				{
-					Velocity = Vector3.Zero;
-					return;
-				}
-
-				// first try just moving to the destination	
-				var dest = (Pos + Velocity * Time.Delta).WithZ( Pos.z );
-
-				var pm = TraceBBox( Pos, dest );
-
-				if ( pm.Fraction == 1 )
-				{
-					Pos = pm.EndPos;
-					StayOnGround();
-					return;
-				}
-
-				StepMove();
-			}
-			finally
-			{
-
-				// Now pull the base velocity back out.   Base velocity is set if you are on a moving object, like a conveyor (or maybe another monster?)
-				Velocity -= BaseVelocity;
-			}
-
-			StayOnGround();
-		}
-
-		private void StepMove()
-		{
-			var vecPos = Pos;
-			var vecVel = Velocity;
-
-			//
-			// First try walking straight to where they want to go.
-			//
-			TryPlayerMove();
-
-			//
-			// mv now contains where they ended up if they tried to walk straight there.
-			// Save those results for use later.
-			//	
-			var vecDownPos = Pos;
-			var vecDownVel = Velocity;
-
-			//
-			// Reset original values to try some other things.
-			//
-			Pos = vecPos;
-			Velocity = vecVel;
-
-			// Only step up as high as we have headroom to do so.	
-			var trace = TraceBBox( Pos, Pos + Vector3.Up * (StepSize + DistEpsilon) );
-			if ( !trace.StartedSolid )
-			{
-				Pos = trace.EndPos;
-			}
-			TryPlayerMove();
-
-
-			trace = TraceBBox( Pos, Pos + Vector3.Down * (StepSize + DistEpsilon * 2) );
-			if ( trace.Normal.z < GroundNormalZ )
-			{
-				if ( Debug )
-				{
-					DebugOverlay.Text( vecDownPos, "step down", 2.0f );
-				}
-
-				Pos = vecDownPos;
-				Velocity = vecDownVel.WithZ( 0 );
-				// out step height
-				return;
-			}
-
-			if ( !trace.StartedSolid )
-			{
-				Pos = trace.EndPos;
-			}
-
-			var vecUpPos = Pos;
-
-			float flDownDist = (vecDownPos.x - vecPos.x) * (vecDownPos.x - vecPos.x) + (vecDownPos.y - vecPos.y) * (vecDownPos.y - vecPos.y);
-			float flUpDist = (vecUpPos.x - vecPos.x) * (vecUpPos.x - vecPos.x) + (vecUpPos.y - vecPos.y) * (vecUpPos.y - vecPos.y);
-			if ( flDownDist > flUpDist )
-			{
-				Pos = vecDownPos;
-				Velocity = vecDownVel;
-			}
-			else
-			{
-				// copy z value from slide move
-				Velocity = Velocity.WithZ( vecDownVel.z );
-			}
-
-			// out step height
-
-		}
-
 		/// <summary>
 		/// Add our wish direction and speed onto our velocity
 		/// </summary>
 		public virtual void Accelerate( Vector3 wishdir, float wishspeed, float speedLimit, float acceleration )
 		{
-			// This gets overridden because some games (CSPort) want to allow dead (observer) players
-			// to be able to move around.
-			// if ( !CanAccelerate() )
-			//     return;
-
-
 			// See if we are changing direction a bit
 			var currentspeed = Velocity.Dot( wishdir );
 
@@ -399,13 +189,6 @@ namespace Sandbox
 		/// </summary>
 		public virtual void ApplyFriction( float frictionAmount = 1.0f )
 		{
-			// If we are in water jump cycle, don't apply friction
-			//if ( player->m_flWaterJumpTime )
-			//   return;
-
-			// Not on ground - no friction
-
-
 			// Calculate speed
 			var speed = Velocity.Length;
 			if ( speed < 0.1f ) return;
@@ -426,55 +209,16 @@ namespace Sandbox
 				newspeed /= speed;
 				Velocity *= newspeed;
 			}
-
-			// mv->m_outWishVel -= (1.f-newspeed) * mv->m_vecVelocity;
 		}
 
 		void CheckJumpButton()
 		{
-			//if ( !player->CanJump() )
-			//    return false;
-
-
-			/*
-            if ( player->m_flWaterJumpTime )
-            {CheckJumpButton
-                player->m_flWaterJumpTime -= gpGlobals->frametime();
-                if ( player->m_flWaterJumpTime < 0 )
-                    player->m_flWaterJumpTime = 0;
-
-                return false;
-            }*/
-
-
-
-			// If we are in the water most of the way...
-
 			if ( GroundEntity == null )
 				return;
 
-			/*
-            if ( player->m_Local.m_bDucking && (player->GetFlags() & FL_DUCKING) )
-                return false;
-            */
-
-			/*
-            // Still updating the eye position.
-            if ( player->m_Local.m_nDuckJumpTimeMsecs > 0u )
-                return false;
-            */
-
 			ClearGroundEntity();
 
-			// player->PlayStepSound( (Vector &)mv->GetAbsOrigin(), player->m_pSurfaceData, 1.0, true );
-
-			// MoveHelper()->PlayerSetAnimation( PLAYER_JUMP );
-
 			float flGroundFactor = 1.0f;
-			//if ( player->m_pSurfaceData )
-			{
-				//   flGroundFactor = g_pPhysicsQuery->GetGameSurfaceproperties( player->m_pSurfaceData )->m_flJumpFactor;
-			}
 
 			float flMul = 268.3281572999747f * 1.2f;
 
@@ -486,12 +230,6 @@ namespace Sandbox
 			Velocity = Velocity.WithZ( startz + flMul * flGroundFactor );
 
 			Velocity -= new Vector3( 0, 0, Gravity * 0.5f ) * Time.Delta;
-
-			// mv->m_outJumpVel.z += mv->m_vecVelocity[2] - startz;
-			// mv->m_outStepHeight += 0.15f;
-
-			// don't jump again until released
-			//mv->m_nOldButtons |= IN_JUMP;
 
 			AddEvent( "jump" );
 
@@ -506,202 +244,10 @@ namespace Sandbox
 
 			Velocity += BaseVelocity;
 
-			TryPlayerMove();
-
 			Velocity -= BaseVelocity;
 		}
 
-		bool IsTouchingLadder = false;
-		Vector3 LadderNormal;
-
-		void CheckLadder()
-		{
-			if ( IsTouchingLadder && Input.Pressed( InputButton.Jump ) )
-			{
-				Velocity = LadderNormal * 100.0f;
-				IsTouchingLadder = false;
-
-				return;
-			}
-
-			const float ladderDistance = 1.0f;
-			var start = Pos;
-			Vector3 end = start + (IsTouchingLadder ? (LadderNormal * -1.0f) : WishVelocity.Normal) * ladderDistance;
-
-			var pm = Trace.Ray( start, end )
-						.Size( mins, maxs )
-						.HitLayer( CollisionLayer.All, false )
-						.HitLayer( CollisionLayer.LADDER, true )
-						.Ignore( Player )
-						.Run();
-
-			IsTouchingLadder = false;
-
-			if ( pm.Hit )
-			{
-				IsTouchingLadder = true;
-				LadderNormal = pm.Normal;
-			}
-		}
-
-		void LadderMove()
-		{
-			var velocity = WishVelocity;
-			float normalDot = velocity.Dot( LadderNormal );
-			var cross = LadderNormal * normalDot;
-			Velocity = (velocity - cross) + (-normalDot * LadderNormal.Cross( Vector3.Up.Cross( LadderNormal ).Normal ));
-
-			TryPlayerMove();
-		}
-
 		Vector3[] planes = new Vector3[5];
-
-		void TryPlayerMove()
-		{
-			var timeLeft = Time.Delta;
-			var allFraction = 0.0f;
-
-			var original_velocity = Velocity;
-			var primal_velocity = Velocity;
-
-			var numplanes = 0;
-
-			for ( int bumpCount = 0; bumpCount < 4; bumpCount++ )
-			{
-				if ( Velocity.Length == 0.0f )
-					break;
-
-				// Assume we can move all the way from the current origin to the
-				//  end point.
-				var end = Pos + Velocity * timeLeft;
-
-				var pm = TraceBBox( Pos, end );
-
-				allFraction += pm.Fraction;
-
-				// actually covered some distance
-				if ( pm.Fraction > DistEpsilon )
-				{
-					// Note: Skipping terrain double check around hack test
-
-					Pos = pm.EndPos;
-					original_velocity = Velocity;
-					numplanes = 0;
-				}
-
-				// If we covered the entire distance, we are done
-				//  and can return.
-				if ( pm.Fraction == 1 )
-				{
-					break;      // moved the entire distance
-				}
-
-				// MoveHelper( )->AddToTouched( pm, mv->m_vecVelocity );
-
-				bool probablyFloor = pm.Normal.z > GroundNormalZ;
-
-				// If the plane we hit has a high z component in the normal, then
-				//  it's probably a floor
-				if ( probablyFloor )
-				{
-
-				}
-
-				// If the plane has a zero z component in the normal, then it's a 
-				//  step or wall
-				if ( pm.Normal.z == 0 )
-				{
-
-				}
-
-				timeLeft -= timeLeft * pm.Fraction;
-
-				if ( numplanes >= planes.Length )
-				{
-					Velocity = Vector3.Zero;
-					break;
-				}
-
-				planes[numplanes] = pm.Normal;
-				numplanes++;
-
-				if ( numplanes == 1 && GroundEntity == null )
-				{
-					var overbounce = 1.001f;
-					if ( !probablyFloor ) overbounce = 1.0f + Bounce * (1.0f - SurfaceFriction);
-
-					original_velocity = ClipVelocity( original_velocity, planes[0], overbounce );
-					Velocity = original_velocity;
-				}
-				else
-				{
-					int i = 0;
-					for ( i = 0; i < numplanes; i++ )
-					{
-						Velocity = ClipVelocity( original_velocity, planes[i], 1.001f );
-
-						int j = 0;
-						for ( j = 0; j < numplanes; j++ )
-						{
-							if ( j == i ) continue;
-
-							// Are we now moving against this plane?
-							if ( Velocity.Dot( planes[j] ) < 0 )
-								break; // not ok
-						}
-
-						if ( j == numplanes )  // Didn't have to clip, so we're ok
-							break;
-					}
-
-					// Did we go all the way through plane set
-					if ( i == numplanes )
-					{
-						if ( numplanes != 2 )
-						{
-							Velocity = Vector3.Zero;
-							break;
-						}
-
-						var dir = Vector3.Cross( planes[0], planes[1] ).Normal;
-						var d = dir.Dot( Velocity );
-						Velocity = dir * d;
-					}
-
-					if ( Vector3.Dot( Velocity, primal_velocity ) <= 0 )
-					{
-						Velocity = Vector3.Zero;
-						break;
-					}
-
-				}
-
-			}
-
-			if ( allFraction == 0 )
-			{
-				Velocity = Vector3.Zero;
-			}
-
-			// Slam Volumes
-		}
-
-		Vector3 ClipVelocity( Vector3 vel, Vector3 norm, float overbounce )
-		{
-			var backoff = Vector3.Dot( vel, norm ) * overbounce;
-
-			var change = norm * backoff;
-			var o = vel - change;
-
-			var adjust = Vector3.Dot( o, norm );
-			if ( adjust < 1.0f )
-			{
-				adjust = MathF.Min( adjust, -1.0f );
-				o -= norm * adjust;
-			}
-
-			return o;
-		}
 
 		void CategorizePosition( bool bStayOnGround )
 		{
@@ -821,29 +367,6 @@ namespace Sandbox
 		/// <summary>
 		/// Try to keep a walking player on the ground when running down slopes etc
 		/// </summary>
-		public virtual void StayOnGround()
-		{
-			var start = Pos + Vector3.Up * 2;
-			var end = Pos + Vector3.Down * StepSize;
-
-			// See how far up we can go without getting stuck
-			var trace = TraceBBox( Pos, start );
-			start = trace.EndPos;
-
-			// Now trace down from a known safe position
-			trace = TraceBBox( start, end );
-
-			if ( trace.Fraction <= 0 ) return;
-			if ( trace.Fraction >= 1 ) return;
-			if ( trace.StartedSolid ) return;
-			if ( trace.Normal.z > GroundNormalZ ) return;
-
-			// This is incredibly hacky. The real problem is that trace returning that strange value we can't network over.
-			// float flDelta = fabs( mv->GetAbsOrigin().z - trace.m_vEndPos.z );
-			// if ( flDelta > 0.5f * DIST_EPSILON )
-
-			Pos = trace.EndPos;
-		}
 
 		void RestoreGroundPos()
 		{

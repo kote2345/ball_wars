@@ -41,7 +41,7 @@ namespace BallsWars
 
 			base.Respawn();
 
-			if ( Spectator == false) SetupPhysicsFromModel(PhysicsMotionType.Dynamic, false);
+			if ( Spectator == false) SetupPhysicsFromModel(PhysicsMotionType.Dynamic, true);
 		}
 		public override void StartTouch( Entity other )
 		{
