@@ -16,6 +16,7 @@ namespace BallsWars
 		public override void PlayerJoined(Player player)
 		{
 			base.PlayerJoined(player);
+			CheckPlayer();
 		}
 
 		public override void PlayerDisconnected(Player player, NetworkDisconnectionReason reason)
@@ -26,6 +27,7 @@ namespace BallsWars
 
 		public override void OnTick()
 		{
+			CheckPlayer();
 		}
 		public override void PlayerKilled( Player player ) 
 		{
@@ -38,7 +40,17 @@ namespace BallsWars
 		{
 			if ( Host.IsClient ) return;
 
-			int playerCount = Player.All.Count;
+			if ( BallGame.Instance.GetPlayerCount() < 2)
+			{
+				List<Player> allPlayers2 = Player.All.Where( player => player != ignored ).ToList();
+
+				foreach ( Player player in allPlayers2 )
+				{
+					(player as BallPlayer).Spectator = true;
+					player.Respawn();
+				}
+				BallGame.Instance.ChangeRound( new LobbyRound() );
+			}
 
 			List<Player> allPlayers = Player.All.Where( player => player != ignored ).ToList();
 
@@ -55,13 +67,8 @@ namespace BallsWars
 			if ( PlayersAlive == 1 )
 			{
 				Log.Info( "End" );
-				//Time.Now
 				BallGame.Instance.ChangeRound( new EndRound() );
 			}
 		}
-		//public async Task ShowWinner ()
-		//{
-		//	await Task.DelaySeconds( 5 );
-		//}
 	}
 }

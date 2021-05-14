@@ -1,4 +1,6 @@
 ﻿using Sandbox;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace BallsWars
 {
@@ -9,6 +11,7 @@ namespace BallsWars
 
 		public override void OnTick()
 		{
+			CheckPlayer();
 			if ( Host.IsServer )
 			{
 				if ( TimeElapsed > RoundLength )
@@ -18,6 +21,21 @@ namespace BallsWars
 			}
 
 			base.OnTick();
+		}
+
+		private void CheckPlayer( Player ignored = null )
+		{
+			if ( BallGame.Instance.GetPlayerCount() < 2 )
+			{
+				List<Player> allPlayers = Player.All.Where( player => player != ignored ).ToList();
+
+				foreach ( Player player in allPlayers )
+				{
+					(player as BallPlayer).Spectator = true;
+					player.Respawn();
+				}
+				BallGame.Instance.ChangeRound( new LobbyRound() );
+			}
 		}
 	}
 }

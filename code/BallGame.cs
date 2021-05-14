@@ -13,6 +13,10 @@ namespace BallsWars
 	{
 		[Net] 
 		public BaseRound Round { get; set; }
+
+		[Net]
+		public int PlayerCount { get; set; } 
+
 		private BaseRound _lastRound;
 
 		public bool Spectator = true;
@@ -22,7 +26,6 @@ namespace BallsWars
 			if ( IsServer )
 			{
 				Log.Info( "My Gamemode Has Created Serverside!" );
-
 				new BallHud();
 
 			}
@@ -48,7 +51,16 @@ namespace BallsWars
 				Round?.OnTick();
 			}
 		}
-
+		public int GetPlayerCount()
+		{
+			if ( IsServer )
+			{
+				PlayerCount = Player.All.Count;
+			}
+			//Log.Info( "GetPlayerCount" );
+			//Log.Info( $"{PlayerCount}" );
+			return PlayerCount;
+		}
 		public void ChangeRound(BaseRound round)
 		{
 			Assert.NotNull(round);
@@ -63,10 +75,12 @@ namespace BallsWars
 		{
 			base.PlayerDisconnected( player, reason );
 			Round?.PlayerDisconnected( player, reason );
+			Log.Info( "Disconnected" );
 		}
 		public override void PlayerJoined( Player player )
 		{
 			base.PlayerJoined( player );
+			Log.Info( "Connected" );
 			Round?.PlayerJoined( player );
 		}
 		public override void PlayerKilled( Player player )

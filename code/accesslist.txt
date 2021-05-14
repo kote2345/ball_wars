@@ -30,7 +30,6 @@ Sandbox.Game/Sandbox.Host.get_IsClient()
 Sandbox.Game/Sandbox.Host.get_IsServer()
 Sandbox.Game/Sandbox.InputButton
 Sandbox.Game/Sandbox.LifeState
-Sandbox.Game/Sandbox.Light.set_WorldPos( Vector3 )
 Sandbox.Game/Sandbox.ModelEntity
 Sandbox.Game/Sandbox.ModelEntity.GetAttachment( System.String, System.Boolean )
 Sandbox.Game/Sandbox.ModelEntity.GetBoneIndex( System.String )
@@ -81,7 +80,6 @@ Sandbox.Game/Sandbox.PlayerController.set_Pos( Vector3 )
 Sandbox.Game/Sandbox.PlayerController.set_Velocity( Vector3 )
 Sandbox.Game/Sandbox.PlayerController.set_ViewOffset( Vector3 )
 Sandbox.Game/Sandbox.PlayerController.set_WishVelocity( Vector3 )
-Sandbox.Game/Sandbox.SunLight..ctor()
 Sandbox.Game/Sandbox.Surface
 Sandbox.Game/Sandbox.Surface.get_Friction()
 Sandbox.Game/Sandbox.TaskSource

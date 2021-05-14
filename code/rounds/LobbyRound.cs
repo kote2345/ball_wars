@@ -16,11 +16,8 @@ namespace BallsWars
 
 		public override void PlayerJoined(Player player)
 		{
-			Log.Info("Player Joined");
 			base.PlayerJoined(player);
-			Log.Info("Joined");
 			CheckReady();
-			Log.Info("Player Joined");
 		}
 
 		public override void PlayerDisconnected(Player player, NetworkDisconnectionReason reason)
@@ -44,8 +41,7 @@ namespace BallsWars
 		{
 			if (Host.IsClient) return;
 
-			int playerCount = Player.All.Count;
-			if (playerCount >= 2)
+			if ( BallGame.Instance.GetPlayerCount() >= 2)
 			{
 				Log.Info("True");
 				List<Player> allPlayers = Player.All.Where(player => player != ignored).ToList();

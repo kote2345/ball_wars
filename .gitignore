@@ -1,0 +1,12 @@
+
+*.vmdl
+*.dmx
+*.props
+*.targets
+code/obj/Debug/net5.0/.NETCoreApp,Version=v5.0.AssemblyAttributes.cs
+code/obj/Debug/net5.0/balls_wars.AssemblyInfo.cs
+*.csproj
+*.json
+*.cache
+*.editorconfig
+*.bin
