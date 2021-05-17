@@ -13,7 +13,7 @@ namespace BallsWars
 
 			RootPanel.StyleSheet.Load( "/ui/BallHud.scss" );
 
-			RootPanel.AddChild<BallNameTags>();
+			RootPanel.AddChild<WinnerHud>();
 			RootPanel.AddChild<ChatBox>();
 			RootPanel.AddChild<VoiceList>();
 			RootPanel.AddChild<KillFeed>();
@@ -21,6 +21,7 @@ namespace BallsWars
 			RootPanel.AddChild<BallWeight>();
 			RootPanel.AddChild<WaitingPeople>();
 			RootPanel.AddChild<Scoreboard<ScoreboardEntry>>();
+			RootPanel.AddChild<WinHud>();
 		}
 	}
 }

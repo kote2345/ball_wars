@@ -8,13 +8,15 @@ namespace BallsWars
 	{
 		[Net]
 		public bool Spectator { get; set; }
-		
+		[Net]
+		public int Energy { get; set; }
 		public override void Spawn()
 		{
 			Spectator = true;
 		}
 		public override void Respawn()
 		{
+			Energy = 100;
 			if ( Spectator == true)
 			{
 				Controller = new NoclipController();
@@ -28,7 +30,7 @@ namespace BallsWars
 			}
 			else
 			{
-				SetModel("models/ball.vmdl");
+				SetModel("models/ball_player.vmdl");
 				Controller = new BallController();
 
 				Camera = new BallCamera();

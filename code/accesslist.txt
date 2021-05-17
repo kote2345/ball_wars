@@ -9,9 +9,11 @@ Sandbox.Game/Sandbox.Camera.set_FieldOfView( System.Single )
 Sandbox.Game/Sandbox.Camera.set_Pos( Vector3 )
 Sandbox.Game/Sandbox.Camera.set_Rot( Rotation )
 Sandbox.Game/Sandbox.Camera.set_Viewer( Sandbox.Entity )
+Sandbox.Game/Sandbox.CollisionGroup
 Sandbox.Game/Sandbox.DebugOverlay.Box( Vector3, Vector3, Vector3, Color, System.Boolean )
 Sandbox.Game/Sandbox.DebugOverlay.ScreenText( System.Int32, System.String, System.Single )
 Sandbox.Game/Sandbox.Entity
+Sandbox.Game/Sandbox.Entity.Delete()
 Sandbox.Game/Sandbox.Entity.get_IsClient()
 Sandbox.Game/Sandbox.Entity.get_IsServer()
 Sandbox.Game/Sandbox.Entity.get_IsWorld()
@@ -23,6 +25,7 @@ Sandbox.Game/Sandbox.Entity.set_EnableDrawing( System.Boolean )
 Sandbox.Game/Sandbox.Entity.set_EnableHideInFirstPerson( System.Boolean )
 Sandbox.Game/Sandbox.Entity.set_EnableShadowInFirstPerson( System.Boolean )
 Sandbox.Game/Sandbox.Entity.set_LocalRot( Rotation )
+Sandbox.Game/Sandbox.Entity.Spawn()
 Sandbox.Game/Sandbox.Entity.Touch( Sandbox.Entity )
 Sandbox.Game/Sandbox.GameBase
 Sandbox.Game/Sandbox.GameBase.get_Current()
@@ -30,13 +33,19 @@ Sandbox.Game/Sandbox.Host.get_IsClient()
 Sandbox.Game/Sandbox.Host.get_IsServer()
 Sandbox.Game/Sandbox.InputButton
 Sandbox.Game/Sandbox.LifeState
+Sandbox.Game/Sandbox.Material
+Sandbox.Game/Sandbox.Material.Load( System.String )
+Sandbox.Game/Sandbox.Model
 Sandbox.Game/Sandbox.ModelEntity
+Sandbox.Game/Sandbox.ModelEntity..ctor()
 Sandbox.Game/Sandbox.ModelEntity.GetAttachment( System.String, System.Boolean )
 Sandbox.Game/Sandbox.ModelEntity.GetBoneIndex( System.String )
 Sandbox.Game/Sandbox.ModelEntity.GetBoneTransform( System.Int32, System.Boolean )
+Sandbox.Game/Sandbox.ModelEntity.set_CollisionGroup( Sandbox.CollisionGroup )
 Sandbox.Game/Sandbox.ModelEntity.set_EnableAllCollisions( System.Boolean )
 Sandbox.Game/Sandbox.ModelEntity.set_EnableTouch( System.Boolean )
 Sandbox.Game/Sandbox.ModelEntity.set_RenderColor( Color32 )
+Sandbox.Game/Sandbox.ModelEntity.SetModel( Sandbox.Model )
 Sandbox.Game/Sandbox.ModelEntity.SetModel( System.String )
 Sandbox.Game/Sandbox.ModelEntity.SetupPhysicsFromModel( Sandbox.PhysicsMotionType, System.Boolean )
 Sandbox.Game/Sandbox.NetRead
@@ -90,10 +99,12 @@ Sandbox.Game/Sandbox.TimeSince
 Sandbox.Game/Sandbox.TimeSince.op_Implicit( Sandbox.TimeSince )
 Sandbox.Game/Sandbox.TimeSince.op_Implicit( System.Single )
 Sandbox.Game/Sandbox.Trace
+Sandbox.Game/Sandbox.Trace.EntitiesOnly()
 Sandbox.Game/Sandbox.Trace.Ignore( Sandbox.Entity )
 Sandbox.Game/Sandbox.Trace.Radius( System.Single )
 Sandbox.Game/Sandbox.Trace.Ray( Vector3, Vector3 )
 Sandbox.Game/Sandbox.Trace.Run()
+Sandbox.Game/Sandbox.Trace.Size( Vector3 )
 Sandbox.Game/Sandbox.Trace.WorldOnly()
 Sandbox.Game/Sandbox.TraceResult
 Sandbox.Game/Sandbox.TraceResult.get_Distance()
@@ -130,15 +141,19 @@ Sandbox.Game/Sandbox.UserInput.get_Left()
 Sandbox.Game/Sandbox.UserInput.get_Rot()
 Sandbox.Game/Sandbox.UserInput.Pressed( Sandbox.InputButton )
 Sandbox.Game/Sandbox.Vector3Extensions.ToScreen( Vector3 )
+Sandbox.Game/Sandbox.VertexBuffer
+Sandbox.Game/Sandbox.VertexBuffer..ctor()
+Sandbox.Game/Sandbox.VertexBuffer.CreateModel( System.String, Sandbox.Material, System.Boolean )
+Sandbox.Game/Sandbox.VertexBuffer.Init( System.Boolean )
+Sandbox.System/Angles
 Sandbox.System/BBox
 Sandbox.System/BBox..ctor( Vector3, Vector3 )
 Sandbox.System/Color
 Sandbox.System/Color.get_Random()
 Sandbox.System/Color.ToColor32( System.Boolean )
 Sandbox.System/Color32
-Sandbox.System/Ray
-Sandbox.System/Ray..ctor( Vector3, Vector3 )
 Sandbox.System/Rotation
+Sandbox.System/Rotation.From( Angles )
 Sandbox.System/Rotation.FromYaw( System.Single )
 Sandbox.System/Rotation.get_Forward()
 Sandbox.System/Rotation.get_Up()
@@ -152,9 +167,6 @@ Sandbox.System/Sandbox.NetVarGroup
 Sandbox.System/Sandbox.UI.Length
 Sandbox.System/Sandbox.UI.Length.Fraction( System.Single )
 Sandbox.System/Sandbox.UI.Length.op_Implicit( System.Single )
-Sandbox.System/Sphere
-Sandbox.System/Sphere.set_Radius( System.Single )
-Sandbox.System/Sphere.Trace( Ray, System.Double )
 Sandbox.System/Transform
 Sandbox.System/Vector3
 Sandbox.System/Vector3..ctor( System.Single, System.Single, System.Single )
@@ -168,6 +180,7 @@ Sandbox.System/Vector3.get_y()
 Sandbox.System/Vector3.get_z()
 Sandbox.System/Vector3.op_Addition( Vector3, Vector3 )
 Sandbox.System/Vector3.op_Equality( Vector3, Vector3 )
+Sandbox.System/Vector3.op_Implicit( System.Single )
 Sandbox.System/Vector3.op_Multiply( Vector3, Rotation )
 Sandbox.System/Vector3.op_Multiply( Vector3, System.Single )
 Sandbox.System/Vector3.op_Subtraction( Vector3, Vector3 )
@@ -203,7 +216,6 @@ System.Private.CoreLib/System.Collections.IEnumerator.MoveNext()
 System.Private.CoreLib/System.Diagnostics.DebuggerBrowsableAttribute
 System.Private.CoreLib/System.Diagnostics.DebuggerHiddenAttribute
 System.Private.CoreLib/System.Diagnostics.DebuggerStepThroughAttribute
-System.Private.CoreLib/System.Double
 System.Private.CoreLib/System.Exception
 System.Private.CoreLib/System.Exception..ctor( System.String )
 System.Private.CoreLib/System.Func`2
@@ -223,6 +235,7 @@ System.Private.CoreLib/System.Runtime.CompilerServices.AsyncTaskMethodBuilder.Aw
 System.Private.CoreLib/System.Runtime.CompilerServices.AsyncTaskMethodBuilder.Create()
 System.Private.CoreLib/System.Runtime.CompilerServices.AsyncTaskMethodBuilder.get_Task()
 System.Private.CoreLib/System.Runtime.CompilerServices.AsyncTaskMethodBuilder.SetException( System.Exception )
+System.Private.CoreLib/System.Runtime.CompilerServices.AsyncTaskMethodBuilder.SetResult()
 System.Private.CoreLib/System.Runtime.CompilerServices.AsyncTaskMethodBuilder.Start<TStateMachine>( TStateMachine& )
 System.Private.CoreLib/System.Runtime.CompilerServices.CompilerGeneratedAttribute
 System.Private.CoreLib/System.Runtime.CompilerServices.IAsyncStateMachine
@@ -231,6 +244,7 @@ System.Private.CoreLib/System.Runtime.CompilerServices.TaskAwaiter.get_IsComplet
 System.Private.CoreLib/System.Runtime.CompilerServices.TaskAwaiter.GetResult()
 System.Private.CoreLib/System.Single
 System.Private.CoreLib/System.String
+System.Private.CoreLib/System.String.Concat( System.String, System.String )
 System.Private.CoreLib/System.String.Format( System.String, System.Object )
 System.Private.CoreLib/System.String.Format( System.String, System.Object, System.Object )
 System.Private.CoreLib/System.Threading.Tasks.Task

@@ -17,10 +17,12 @@ namespace BallsWars
 
 		public override void Tick()
 		{
-			if ( Sandbox.Player.Local is not Player player ) return;
-			SetClass( "spectator", (player as BallPlayer).Spectator == true );
-			PowerBar.Style.Width = 100;
+			var player = Player.Local as BallPlayer;
+			if ( player == null ) return;
+			PowerBar.Style.Width = player.Energy;
 			PowerBar.Style.Dirty();
+
+			SetClass( "spectator", player.Spectator == true );
 		}
 	}
 }

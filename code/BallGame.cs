@@ -15,8 +15,9 @@ namespace BallsWars
 		public BaseRound Round { get; set; }
 
 		[Net]
-		public int PlayerCount { get; set; } 
-
+		public int PlayerCount { get; set; }
+		[Net]
+		public Player WinPlayer { get; set; }
 		private BaseRound _lastRound;
 
 		public bool Spectator = true;

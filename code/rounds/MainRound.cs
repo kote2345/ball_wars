@@ -60,8 +60,9 @@ namespace BallsWars
 			{
 				if ( (player as BallPlayer).Spectator == false )
 				{
-					Log.Info( "Check Player" );
+					//Log.Info( "Check Player" );
 					PlayersAlive++;
+					BallGame.Instance.WinPlayer = player;
 				}
 			}
 			if ( PlayersAlive == 1 )

@@ -28,14 +28,14 @@ namespace Sandbox.UI
 			// Nothing to do unless we're showing health and shit
 		}
 	}
-	public class BallNameTags : Panel
+	public class WinnerHud : Panel
 	{
 		Dictionary<Player, BallBaseNameTag> ActiveTags = new Dictionary<Player, BallBaseNameTag>();
 
 		public float MaxDrawDistance = 400;
 		public int MaxTagsToShow = 5;
 
-		public BallNameTags()
+		public WinnerHud()
 		{
 			StyleSheet.Load( "/ui/nametags/BallNameTags.scss" );
 		}

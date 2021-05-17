@@ -6,8 +6,23 @@ namespace BallsWars
 {
 	public partial class EndRound : BaseRound
 	{
+		private WinHud _statsPanel;
 		public override string Name => "End Round";
 		public override int RoundLength => 8;
+
+		public override void Start()
+		{
+			Log.Info( "Start End Round" );
+			if ( Host.IsClient )
+			{
+				_statsPanel = Sandbox.Hud.CurrentPanel.AddChild<WinHud>();
+			}
+		}
+
+		public override void Finish()
+		{
+			Log.Info( "Finished Stats Round" );
+		}
 
 		public override void OnTick()
 		{
@@ -16,6 +31,11 @@ namespace BallsWars
 			{
 				if ( TimeElapsed > RoundLength )
 				{
+					if ( _statsPanel != null )
+					{
+						Log.Info( "Kill HUD" );
+						_statsPanel.Delete();
+					}
 					BallGame.Instance.ChangeRound( new LobbyRound() );
 				}
 			}
