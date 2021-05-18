@@ -13,14 +13,9 @@ namespace Sandbox
 	[Library]
 	public class BallController : BasePlayerController
 	{
-		public float SprintSpeed { get; set; } = 100.0f;
-		public float WalkSpeed { get; set; } = 100.0f;
-		public float DefaultSpeed { get; set; } = 100.0f;
-		public float AirAcceleration { get; set; } = 10;
+		public float AirAcceleration { get; set; } = 6;
 		public float StopSpeed { get; set; } = 100.0f;
-		public float DistEpsilon { get; set; } = 0.03125f;
 		public float GroundNormalZ { get; set; } = 0.707f;
-		public float Bounce { get; set; } = 0.0f;
 		public float StepSize { get; set; } = 18.0f;
 		public float MaxNonJumpVelocity { get; set; } = 140.0f;
 		public float BodyGirth { get; set; } = 32.0f;
@@ -29,14 +24,14 @@ namespace Sandbox
 		public float Gravity { get; set; } = 800.0f;
 		public float AirControl { get; set; } = 30.0f;
 		public bool AutoJump { get; set; } = false;
+		public float Speed { get; set; } = 1f;
+		public bool isEnergyNull = false;
 
-		public Duck Duck;
 		public Unstuck Unstuck;
 
 
 		public BallController()
 		{
-			Duck = new Duck( this );
 			Unstuck = new Unstuck( this );
 		}
 
@@ -110,9 +105,14 @@ namespace Sandbox
 			WishVelocity *= Input.Rot;
 
 			WishVelocity = WishVelocity.Normal * inSpeed;
-			WishVelocity *= GetWishSpeed();
 
-			Duck.PreTick();
+			//if ( Input.Down( InputButton.Run ) )
+			//{
+			//	Log.Info( $"{Velocity.Length}" );
+			//	WishVelocity *= WishVelocity.Normal * AirAcceleration;
+			//}
+
+			WishVelocity *= GetSpeed();
 
 			bool bStayOnGround = false;
 
@@ -124,7 +124,7 @@ namespace Sandbox
 
 			if ( GroundEntity != null )
 			{
-				Log.Info( "1" );
+				//Log.Info( "1" );
 				Velocity = Velocity.WithZ( 0);
 			}
 
@@ -148,15 +148,24 @@ namespace Sandbox
 
 		}
 
-		public virtual float GetWishSpeed()
+		public virtual float GetSpeed()
 		{
-			var ws = Duck.GetWishSpeed();
-			if ( ws >= 0 ) return ws;
+			bool leftDown = Input.Left == 1f;
+			bool rightDown = Input.Left == -1f;
+			bool DownDown = Input.Forward == -1f;
 
-			if ( Input.Down( InputButton.Run ) ) return SprintSpeed;
-			if ( Input.Down( InputButton.Walk ) ) return WalkSpeed;
+			Speed = Speed.Approach( 0, Speed * Time.Delta * 0.3f );
 
-			return DefaultSpeed;
+			if ( Input.Down( InputButton.Run ) & isEnergyNull == false )
+			{
+				Speed += 0.8f;
+			}
+			if ( Input.Down( InputButton.Forward ) || leftDown == true || rightDown == true || DownDown == true )
+			{
+				Speed += 0.5f;
+			}
+			if ( Speed > 400 ) Speed = 400; 
+			return Speed;
 		}
 
 		/// <summary>
@@ -176,7 +185,6 @@ namespace Sandbox
 
 			// Determine amount of acceleration.
 			var accelspeed = acceleration * Time.Delta * wishspeed * SurfaceFriction;
-
 			// Cap at addspeed
 			if ( accelspeed > addspeed )
 				accelspeed = addspeed;
@@ -224,9 +232,6 @@ namespace Sandbox
 
 			float startz = Velocity.z;
 
-			if ( Duck.IsActive )
-				flMul *= 0.8f;
-
 			Velocity = Velocity.WithZ( startz + flMul * flGroundFactor );
 
 			Velocity -= new Vector3( 0, 0, Gravity * 0.5f ) * Time.Delta;
@@ -244,7 +249,7 @@ namespace Sandbox
 
 			Velocity += BaseVelocity;
 
-			Velocity -= BaseVelocity;
+			//Velocity -= BaseVelocity;
 		}
 
 		Vector3[] planes = new Vector3[5];

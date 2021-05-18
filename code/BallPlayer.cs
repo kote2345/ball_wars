@@ -48,7 +48,6 @@ namespace BallsWars
 		public override void StartTouch( Entity other )
 		{
 			base.StartTouch( other );
-			Log.Info( "Touch" );
 			//var ent = other as Model;
 			//other.Delete();
 		}
@@ -56,8 +55,23 @@ namespace BallsWars
 
 		protected override void Tick()
 		{
+			if ( Input.Down( InputButton.Run ) & Energy > 1 )
+			{
+				Energy--;
+				Log.Info( $"{Energy}" );
+			}
+			if ( Controller is BallController )
+			{
+				if ( Energy < 1)
+				{
+					(Controller as BallController).isEnergyNull = true;
+				}
+				else
+				{
+					(Controller as BallController).isEnergyNull = false;
+				}
+			}
 			base.Tick();
-
 		}
 
 		public override void OnKilled()
