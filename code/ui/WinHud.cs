@@ -22,7 +22,7 @@ namespace BallsWars
 			//Log.Info( $"{BallGame.Instance.GetPlayerCount()}" );
 			if ( BallGame.Instance.Round is EndRound )
 			{
-				NameLabel.SetText( BallGame.Instance.WinPlayer.Name + "\nWin !");
+				NameLabel.SetText( BallGame.Instance.WinPlayer.EntityName + "\nWin !");
 			}
 			else
 			{

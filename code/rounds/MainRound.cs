@@ -13,15 +13,15 @@ namespace BallsWars
 		public int PlayersAlive = 0;
 		public override string Name => "MainRound";
 
-		public override void PlayerJoined(Player player)
+		public override void ClientJoined(Client cl)
 		{
-			base.PlayerJoined(player);
+			base.ClientJoined( cl );
 			CheckPlayer();
 		}
 
-		public override void PlayerDisconnected(Player player, NetworkDisconnectionReason reason)
+		public override void ClientDisconnect( Client cl, NetworkDisconnectionReason reason)
 		{
-			base.PlayerDisconnected(player, reason);
+			base.ClientDisconnect( cl, reason);
 			CheckPlayer();
 		}
 
@@ -29,12 +29,12 @@ namespace BallsWars
 		{
 			CheckPlayer();
 		}
-		public override void PlayerKilled( Player player ) 
+		public override void OnKilled() 
 		{
 			Log.Info("Killed");
 			//(player as BallPlayer).Spectator = true;
 			CheckPlayer();
-			base.PlayerKilled( player );
+			base.OnKilled();
 		}
 		private void CheckPlayer( Player ignored = null )
 		{
@@ -42,9 +42,7 @@ namespace BallsWars
 
 			if ( BallGame.Instance.GetPlayerCount() < 2)
 			{
-				List<Player> allPlayers2 = Player.All.Where( player => player != ignored ).ToList();
-
-				foreach ( Player player in allPlayers2 )
+				foreach ( Player player in Client.All )
 				{
 					(player as BallPlayer).Spectator = true;
 					player.Respawn();
@@ -52,19 +50,18 @@ namespace BallsWars
 				BallGame.Instance.ChangeRound( new LobbyRound() );
 			}
 
-			List<Player> allPlayers = Player.All.Where( player => player != ignored ).ToList();
-
 			PlayersAlive = 0;
 
-			foreach ( Player player in allPlayers )
-			{
-				if ( (player as BallPlayer).Spectator == false )
-				{
+			//foreach ( Player player in Client.All )
+			//{
+			//	if ( (player as BallPlayer).Spectator == false )
+			//	{
 					//Log.Info( "Check Player" );
-					PlayersAlive++;
-					BallGame.Instance.WinPlayer = player;
-				}
-			}
+			//		PlayersAlive++;
+			//		BallGame.Instance.WinPlayer = player;
+			//	}
+			//}
+
 			if ( PlayersAlive == 1 )
 			{
 				Log.Info( "End" );

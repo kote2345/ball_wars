@@ -70,8 +70,8 @@ namespace Sandbox
 		{
 			var girth = BodyGirth * 0.5f;
 
-			var mins = new Vector3( -girth, -girth, 0 ) * Player.WorldScale;
-			var maxs = new Vector3( +girth, +girth, BodyHeight ) * Player.WorldScale;
+			var mins = new Vector3( -girth, -girth, 0 ) * Pawn.Scale;
+			var maxs = new Vector3( +girth, +girth, BodyHeight ) * Pawn.Scale;
 
 
 			SetBBox( mins, maxs );
@@ -79,12 +79,12 @@ namespace Sandbox
 
 		protected float SurfaceFriction;
 
-		public override void Tick()
+		public override void Simulate()
 		{
-			ViewOffset = Vector3.Up * (EyeHeight * Player.WorldScale);
+			EyePosLocal = Vector3.Up * (EyeHeight * Pawn.Scale);
 			UpdateBBox();
 
-			ViewOffset += TraceOffset;
+			EyePosLocal += TraceOffset;
 
 			RestoreGroundPos();
 
@@ -102,7 +102,7 @@ namespace Sandbox
 			//
 			WishVelocity = new Vector3( Input.Forward, Input.Left, 0 );
 			var inSpeed = WishVelocity.Length.Clamp( 0, 1 );
-			WishVelocity *= Input.Rot;
+			WishVelocity *= Input.Rotation;
 
 			WishVelocity = WishVelocity.Normal * inSpeed;
 
@@ -304,7 +304,7 @@ namespace Sandbox
 
 			if ( bMoveToEndPos && !pm.StartedSolid && pm.Fraction > 0.0f && pm.Fraction < 1.0f )
 			{
-				Pos = pm.EndPos;
+				Position = pm.EndPos;
 			}
 
 		}

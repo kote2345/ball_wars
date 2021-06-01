@@ -41,7 +41,7 @@ namespace BallsWars
 			{
 				await Task.DelaySeconds( 0.001f );
 				rotation += 1;
-				LocalRot = Rotation.FromYaw( rotation );
+				LocalRotation = Rotation.FromYaw( rotation );
 			}
 		}
 		public override void StartTouch( Entity other )

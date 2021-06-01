@@ -4,7 +4,7 @@ using Sandbox.UI;
 namespace BallsWars
 {
 	[Library]
-	public partial class BallHud : Hud
+	public partial class BallHud : HudEntity<RootPanel>
 	{
 		public BallHud()
 		{

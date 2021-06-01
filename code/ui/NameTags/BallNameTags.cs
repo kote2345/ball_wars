@@ -19,8 +19,8 @@ namespace Sandbox.UI
 		{
 			this.player = player;
 
-			NameLabel = Add.Label( player.Name );
-			Avatar = Add.Image( $"avatar:{player.SteamId}" );
+			NameLabel = Add.Label( player.EntityName );
+			//Avatar = Add.Image( $"avatar:{client.SteamId}" );
 		}
 
 		public virtual void UpdateFromPlayer( Player player )
@@ -48,7 +48,7 @@ namespace Sandbox.UI
 			deleteList.AddRange( ActiveTags.Keys );
 
 			int count = 0;
-			foreach ( var player in Player.All.OrderBy( x => Vector3.DistanceBetween( x.EyePos, Camera.LastPos ) ) )
+			foreach ( var player in Entity.All.OfType<Player>().OrderBy( x => Vector3.DistanceBetween( x.Position, CurrentView.Position ) ) )
 			{
 				if ( UpdateNameTag( player ) )
 				{
@@ -77,7 +77,7 @@ namespace Sandbox.UI
 		public bool UpdateNameTag( Player player )
 		{
 			// Don't draw local player
-			if ( player.IsLocalPlayer )
+			if ( player == Local.Pawn )
 				return false;
 
 			if ( player.LifeState != LifeState.Alive )
@@ -93,15 +93,15 @@ namespace Sandbox.UI
 			//
 			// Are we too far away?
 			//
-			float dist = labelPos.Distance( Camera.LastPos );
+			float dist = labelPos.Distance( CurrentView.Position );
 			if ( dist > MaxDrawDistance )
 				return false;
 
 			//
 			// Are we looking in this direction?
 			//
-			var lookDir = (labelPos - Camera.LastPos).Normal;
-			if ( Camera.LastRot.Forward.Dot( lookDir ) < 0.5 )
+			var lookDir = (labelPos - CurrentView.Position).Normal;
+			if ( CurrentView.Rotation.Forward.Dot( lookDir ) < 0.5 )
 				return false;
 
 			// TODO - can we see them
@@ -115,7 +115,7 @@ namespace Sandbox.UI
 			var alpha = dist.LerpInverse( MaxDrawDistance, MaxDrawDistance * 0.1f, true );
 
 			// If I understood this I'd make it proper function
-			var objectSize = 0.05f / dist / (2.0f * MathF.Tan( (Camera.LastFieldOfView / 2.0f).DegreeToRadian() )) * 1500.0f;
+			var objectSize = 0.05f / dist / (2.0f * MathF.Tan( (CurrentView.FieldOfView / 2.0f).DegreeToRadian() )) * 1500.0f;
 
 			objectSize = objectSize.Clamp( 0.05f, 1.0f );
 

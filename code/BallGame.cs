@@ -71,23 +71,25 @@ namespace BallsWars
 			Round?.Start();
 		}
 
-		public override Player CreatePlayer() => new BallPlayer();
-		public override void PlayerDisconnected( Sandbox.Player player, NetworkDisconnectionReason reason )
+		public override void ClientDisconnect( Client cl, NetworkDisconnectionReason reason )
 		{
-			base.PlayerDisconnected( player, reason );
-			Round?.PlayerDisconnected( player, reason );
+			base.ClientDisconnect( cl, reason );
+			Round?.ClientDisconnect( cl, reason );
 			Log.Info( "Disconnected" );
 		}
-		public override void PlayerJoined( Player player )
+		public override void ClientJoined( Client cl )
 		{
-			base.PlayerJoined( player );
+			base.ClientJoined( cl );
+			var player = new BallPlayer();
+			player.Respawn();
+			cl.Pawn = player;
 			Log.Info( "Connected" );
-			Round?.PlayerJoined( player );
+			Round?.ClientJoined( cl );
 		}
-		public override void PlayerKilled( Player player )
+		public override void OnKilled()
 		{
-			base.PlayerKilled( player );
-			Round?.PlayerKilled( player );
+			base.OnKilled();
+			Round?.OnKilled();
 		}
 		private void OnTick()
 		{

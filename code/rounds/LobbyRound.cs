@@ -14,16 +14,16 @@ namespace BallsWars
 
 		public override string Name => "Lobby";
 
-		public override void PlayerJoined(Player player)
+		public override void ClientJoined( Client cl )
 		{
-			base.PlayerJoined(player);
+			base.ClientJoined( cl );
 			CheckReady();
 		}
 
-		public override void PlayerDisconnected(Player player, NetworkDisconnectionReason reason)
+		public override void ClientDisconnect( Client cl, NetworkDisconnectionReason reason )
 		{
-			base.PlayerDisconnected(player, reason);
-			CheckReady(player);
+			base.ClientDisconnect( cl, reason );
+			CheckReady();
 		}
 
 		public override void Start()
@@ -44,9 +44,7 @@ namespace BallsWars
 			if ( BallGame.Instance.GetPlayerCount() >= 2)
 			{
 				Log.Info("True");
-				List<Player> allPlayers = Player.All.Where(player => player != ignored).ToList();
-
-				foreach (Player player in allPlayers)
+				foreach ( Player player in Client.All )
 				{
 					(player as BallPlayer).Spectator = false;
 					player.Respawn();

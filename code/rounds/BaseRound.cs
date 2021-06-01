@@ -25,8 +25,8 @@ namespace BallsWars
 		public virtual void Start() { }
 		public virtual void Finish() { }
 		public virtual void OnTick() { }
-		public virtual void PlayerKilled(Player player) { }
-		public virtual void PlayerJoined( Player player ) { }
-		public virtual void PlayerDisconnected( Player player, NetworkDisconnectionReason reason ) { }
+		public virtual void OnKilled() { }
+		public virtual void ClientJoined( Client cl ) { }
+		public virtual void ClientDisconnect( Client cl, NetworkDisconnectionReason reason ) { }
 	}
 }

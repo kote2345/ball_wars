@@ -17,7 +17,7 @@ namespace BallsWars
 
 		public override void Tick()
 		{
-			if ( Sandbox.Player.Local is not Player player ) return;
+			if ( Sandbox.Local.Pawn is not Player player ) return;
 			SetClass( "spectator", (player as BallPlayer).Spectator == true );
 		}
 	}

@@ -17,7 +17,7 @@ namespace BallsWars
 
 		public override void Tick()
 		{
-			var player = Player.Local as BallPlayer;
+			var player = Local.Pawn as BallPlayer;
 			if ( player == null ) return;
 			PowerBar.Style.Width = player.Energy;
 			PowerBar.Style.Dirty();

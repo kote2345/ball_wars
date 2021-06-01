@@ -1,6 +1,6 @@
 ﻿using Sandbox;
 
-public class BallCamera : BaseCamera
+public class BallCamera : Camera
 {
 	private Vector3 focusPoint;
 
@@ -10,18 +10,19 @@ public class BallCamera : BaseCamera
 
 		focusPoint = GetSpectatePoint();
 		Pos = focusPoint + GetViewOffset();
-		FieldOfView = LastFieldOfView;
+		FieldOfView = CurrentView.FieldOfView;
 	}
 
 	public override void Update()
 	{
-		if ( Player.Local is not BasePlayer player ) return;
+		var player = Local.Client;
+		if ( player == null ) return;
 
 		focusPoint = GetSpectatePoint();
 		Pos = focusPoint + GetViewOffset();
 
 		var tr = Trace.Ray( focusPoint, Pos )
-			.Ignore( player )
+			.Ignore( Local.Pawn )
 			.WorldOnly()
 			.Radius( 4 )
 			.Run();
@@ -31,13 +32,13 @@ public class BallCamera : BaseCamera
 		// without getting initially stuck
 		//
 		tr = Trace.Ray( focusPoint + tr.Direction * (tr.Distance * 0.5f), tr.EndPos )
-			.Ignore( player )
+			.Ignore( Local.Pawn )
 			.WorldOnly()
 			.Radius( 8 )
 			.Run();
 
 		Pos = tr.EndPos;
-		Rot = player.EyeRot;
+		Rot = Local.Pawn.EyeRot;
 
 		Viewer = null;
 
@@ -45,8 +46,8 @@ public class BallCamera : BaseCamera
 
 	public virtual Vector3 GetSpectatePoint()
 	{
-		if ( Player.Local is not BasePlayer player )
-			return LastPos;
+		if ( Local.Pawn is not Player player )
+			return Local.Pawn.Position;
 
 		if ( !player.Corpse.IsValid() || player.Corpse is not ModelEntity corpse )
 			return player.GetBoneTransform( player.GetBoneIndex( "spine2" ) ).Pos;
@@ -56,7 +57,7 @@ public class BallCamera : BaseCamera
 
 	public virtual Vector3 GetViewOffset()
 	{
-		if ( Player.Local is not BasePlayer player ) return Vector3.Zero;
+		if ( Local.Pawn is not Player player ) return Vector3.Zero;
 
 		return player.EyeRot.Forward * -200 + Vector3.Up * 20;
 	}

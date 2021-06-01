@@ -13,10 +13,6 @@ namespace BallsWars
 		public override void Start()
 		{
 			Log.Info( "Start End Round" );
-			if ( Host.IsClient )
-			{
-				_statsPanel = Sandbox.Hud.CurrentPanel.AddChild<WinHud>();
-			}
 		}
 
 		public override void Finish()
@@ -31,11 +27,6 @@ namespace BallsWars
 			{
 				if ( TimeElapsed > RoundLength )
 				{
-					if ( _statsPanel != null )
-					{
-						Log.Info( "Kill HUD" );
-						_statsPanel.Delete();
-					}
 					BallGame.Instance.ChangeRound( new LobbyRound() );
 				}
 			}
@@ -47,9 +38,10 @@ namespace BallsWars
 		{
 			if ( BallGame.Instance.GetPlayerCount() < 2 )
 			{
-				List<Player> allPlayers = Player.All.Where( player => player != ignored ).ToList();
-
-				foreach ( Player player in allPlayers )
+				Entity.All.Where( player => player is Player ).Cast<Player>().ToList();
+				//List<Player> allPlayers = Entity.All.Where( player => player != ignored ).ToList();
+				var PlayerList = Client.All;
+				foreach ( Player player in Client.All )
 				{
 					(player as BallPlayer).Spectator = true;
 					player.Respawn();

@@ -4,18 +4,20 @@ using System.Linq;
 
 namespace BallsWars
 {
-	partial class BallPlayer : BasePlayer
+	partial class BallPlayer : Player
 	{
 		[Net]
-		public bool Spectator { get; set; }
+		public bool Spectator { get; set; } = false;
 		[Net]
 		public int Energy { get; set; }
 		public override void Spawn()
 		{
-			Spectator = true;
+			Spectator = false;
+			base.Spawn();
 		}
 		public override void Respawn()
 		{
+			Log.Info( $"{Spectator}" );
 			Energy = 100;
 			if ( Spectator == true)
 			{
@@ -53,7 +55,7 @@ namespace BallsWars
 		}
 
 
-		protected override void Tick()
+		public override void Simulate( Client cl )
 		{
 			if ( Input.Down( InputButton.Run ) & Energy > 1 )
 			{
@@ -71,7 +73,7 @@ namespace BallsWars
 					(Controller as BallController).isEnergyNull = false;
 				}
 			}
-			base.Tick();
+			base.Simulate( cl );
 		}
 
 		public override void OnKilled()
